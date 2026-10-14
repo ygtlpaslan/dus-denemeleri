@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DUS Deneme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="ortak.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><h1><a href="index.html">DUS</a> <span id="dno">Deneme</span></h1><small id="dtarih"></small></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <nav class="tabs" role="tablist" aria-label="Bölümler">
+        <button id="tab-deneme" role="tab" aria-selected="true" data-view="deneme">Deneme</button>
+        <button id="tab-sonuc" role="tab" aria-selected="false" data-view="sonuc">Sonuç</button>
+      </nav>
+      <a class="navlink" href="index.html">Tüm denemeler</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+<div id="v-deneme">
+  <div id="d-start"></div>
+  <div id="d-exam" hidden>
+    <div class="exam">
+      <div><div class="qcard" id="qcard"></div></div>
+      <aside class="optik" id="optik">
+        <div class="ohead">
+          <div class="eyebrow" id="tlabel">Kalan süre</div>
+          <div class="timer" id="timer">150:00</div>
+          <div class="ostats" id="ostats"></div>
+          <button class="btn otoggle" id="otoggle">Optik formu göster</button>
+        </div>
+        <div class="olist" id="olist"></div>
+      </aside>
+    </div>
+  </div>
+</div>
+<div id="v-sonuc" hidden></div>
+</main>
+
+<script src="denemeler/liste.js"></script>
+<script>
+/* ---------- Sabit ders yapısı (her deneme bu sırayı izler) ---------- */
+const TEMEL=[["Anatomi",6],["Histoloji ve Embriyoloji",4],["Fizyoloji",6],["Biyokimya",6],["Mikrobiyoloji",6],["Patoloji",4],["Farmakoloji",4],["Tıbbi Biyoloji ve Genetik",4]];
+const KLINIK=[["Restoratif Diş Tedavisi",10],["Protetik Diş Tedavisi",10],["Ağız, Diş ve Çene Cerrahisi",10],["Ağız, Diş ve Çene Radyolojisi",10],["Periodontoloji",10],["Ortodonti",10],["Endodonti",10],["Çocuk Diş Hekimliği",10]];
+const DERS=[];[...TEMEL,...KLINIK].forEach(([n,c])=>{for(let i=0;i<c;i++)DERS.push(n)});
+const SEC=i=>i<40?"T":"K";
+const L=["A","B","C","D","E"];
+const ROM=["I.","II.","III.","IV.","V."];
+const $=id=>document.getElementById(id);
+const fmt=sec=>{sec=Math.max(0,Math.round(sec));return String(Math.floor(sec/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0")};
+
+/* ---------- Hangi deneme? ?no=2 veya #2 ---------- */
+const LISTE=(window.DENEMELER||[]).slice().sort((a,b)=>a.no-b.no);
+const istenen=parseInt(new URLSearchParams(location.search).get("no")||(location.hash.match(/\d+/)||[])[0],10);
+const META=LISTE.find(d=>d.no===istenen)||LISTE[LISTE.length-1];
+let Q=[], STORE="", S=null;
+
+function hata(msg){$("d-start").innerHTML=`<div class="empty">${msg} <a href="index.html">Tüm denemelere dön</a>.</div>`}
+if(!META){hata("Henüz yayınlanmış deneme yok.")}
+else{
+  const sc=document.createElement("script");
+  sc.src="denemeler/"+META.dosya;
+  sc.onload=()=>{if(!window.DENEME||!Array.isArray(window.DENEME.Q)){hata("Deneme dosyası okunamadı.");return}Q=window.DENEME.Q;init()};
+  sc.onerror=()=>hata("Deneme dosyası bulunamadı ("+META.dosya+").");
+  document.body.appendChild(sc);
+}
+
+/* ---------- Durum ---------- */
+function fresh(){return{view:"deneme",started:false,finished:false,paused:false,mode:"sinav",scope:"all",ans:{},flags:{},cur:0,elapsed:0}}
+function load(){try{const raw=localStorage.getItem(STORE);if(raw){const o=JSON.parse(raw);if(o&&typeof o==="object")return Object.assign(fresh(),o)}}catch(e){}return fresh()}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(S))}catch(e){}}
+function scopeIdx(){const all=Q.map((_,i)=>i);return S.scope==="T"?all.filter(i=>i<40):S.scope==="K"?all.filter(i=>i>=40):all}
+function limitSec(){return S.scope==="T"?50*60:S.scope==="K"?100*60:150*60}
+
+function init(){
+  STORE="dus-deneme-"+META.no+"-v1";
+  S=load();
+  document.title=META.baslik;
+  $("dno").textContent="Deneme "+META.no;
+  $("dtarih").textContent=META.tarih?new Date(META.tarih+"T12:00:00").toLocaleDateString("tr-TR",{day:"numeric",month:"long",year:"numeric"}):"";
+  document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.view)));
+  $("otoggle").addEventListener("click",()=>{const o=$("optik");o.classList.toggle("collapsed");$("otoggle").textContent=o.classList.contains("collapsed")?"Optik formu göster":"Optik formu gizle"});
+  if(window.matchMedia&&window.matchMedia("(max-width:900px)").matches)$("optik").classList.add("collapsed");
+  document.addEventListener("keydown",onKey);
+  if(S.started&&!S.finished)S.paused=true;
+  setView(S.finished?"sonuc":"deneme");
+}
+
+/* ---------- Görünüm ---------- */
+function setView(v){
+  if(v==="sonuc"&&!S.finished)v="deneme";
+  S.view=v;save();
+  ["deneme","sonuc"].forEach(x=>{$("v-"+x).hidden=x!==v;$("tab-"+x).setAttribute("aria-selected",String(x===v))});
+  $("tab-sonuc").disabled=!S.finished;
+  if(v==="deneme")renderDeneme();else renderSonuc();
+  window.scrollTo(0,0);
+}
+
+/* ---------- Başlangıç ekranı ---------- */
+function renderStart(){
+  const answered=Object.keys(S.ans).length, resume=S.started&&!S.finished;
+  $("d-start").innerHTML=`<div class="startcard">
+    <div class="eyebrow">${META.baslik} · ${Q.length} soru</div>
+    <h2>${resume?"Kaldığın yerden devam et":"Denemeyi başlat"}</h2>
+    ${resume?`<p class="lede" style="font-size:16px">${answered} soru işaretlenmiş, ${S.mode==="sinav"?"kalan süre "+fmt(limitSec()-S.elapsed):"geçen süre "+fmt(S.elapsed)}.</p>
+      <div class="cta"><button class="btn primary" id="resume">Devam et</button><button class="btn" id="reset">Baştan başla</button></div>`
+    :`<p class="lede" style="font-size:16px">${META.aciklama||""} Ders dağılımı, süre ve dört yanlışın bir doğruyu götürdüğü net hesabı gerçek sınavla aynı.</p>
+    <div class="opts" role="radiogroup" aria-label="Mod">
+      <label class="radio"><input type="radio" name="mode" id="m-sinav" value="sinav" ${S.mode==="sinav"?"checked":""}><div><b>Sınav modu</b><span>Geri sayım çalışır, doğru cevaplar ve açıklamalar sınav bitince gösterilir.</span></div></label>
+      <label class="radio"><input type="radio" name="mode" id="m-calisma" value="calisma" ${S.mode==="calisma"?"checked":""}><div><b>Çalışma modu</b><span>Her sorudan sonra doğru cevap ve açıklama hemen açılır; süre sınırı yok.</span></div></label>
+    </div>
+    <div><b style="font-size:14px">Kapsam</b>
+      <div class="rgroup">
+        <label><input type="radio" name="scope" id="s-all" value="all" ${S.scope==="all"?"checked":""}>Tam deneme (120 soru · 150 dk)</label>
+        <label><input type="radio" name="scope" id="s-T" value="T" ${S.scope==="T"?"checked":""}>Yalnız Temel (40 · 50 dk)</label>
+        <label><input type="radio" name="scope" id="s-K" value="K" ${S.scope==="K"?"checked":""}>Yalnız Klinik (80 · 100 dk)</label>
+      </div></div>
+    <div class="cta"><button class="btn primary" id="begin">Başla</button></div>`}
+  </div>`;
+  if(resume){$("resume").onclick=()=>{startTimer();renderDeneme()};$("reset").onclick=()=>{S=fresh();save();renderDeneme()}}
+  else $("begin").onclick=()=>{
+    S.mode=document.querySelector('input[name="mode"]:checked').value;
+    S.scope=document.querySelector('input[name="scope"]:checked').value;
+    S.started=true;S.finished=false;S.ans={};S.flags={};S.elapsed=0;S.cur=scopeIdx()[0];save();startTimer();renderDeneme();
+  };
+}
+
+/* ---------- Sınav ekranı ---------- */
+let tick=null, confirmOpen=false;
+function startTimer(){S.paused=false;save();if(tick)clearInterval(tick);tick=setInterval(()=>{
+  if(!S.started||S.finished||S.paused||S.view!=="deneme"||document.hidden)return;
+  S.elapsed++; if(S.elapsed%5===0)save(); drawTimer();
+  if(S.mode==="sinav"&&S.elapsed>=limitSec())finish();
+},1000)}
+function drawTimer(){
+  const el=$("timer");
+  if(S.mode==="sinav"){const rem=limitSec()-S.elapsed;el.textContent=fmt(rem);el.classList.toggle("low",rem<600);$("tlabel").textContent="Kalan süre"}
+  else{el.textContent=fmt(S.elapsed);el.classList.remove("low");$("tlabel").textContent="Geçen süre"}
+}
+function renderDeneme(){
+  if(S.finished){setView("sonuc");return}
+  const exam=S.started&&!S.paused;
+  $("d-start").hidden=exam;$("d-exam").hidden=!exam;
+  if(!exam){renderStart();return}
+  if(!tick)startTimer();
+  drawTimer();renderQ();renderOptik();
+}
+function qHTML(i,opts){
+  const q=Q[i],sec=SEC(i);
+  const roman=q.r?`<ol class="roman">${q.r.map((x,k)=>`<li><span>${ROM[k]}</span><span>${x}</span></li>`).join("")}</ol>`:"";
+  const bold=!q.q.includes("<b>"), chosen=S.ans[i], reveal=opts.reveal;
+  const choices=q.o.map((o,k)=>{const l=L[k];let cls="choice";
+    if(reveal){if(l===q.a)cls+=" ok";else if(l===chosen)cls+=" no"}else if(l===chosen)cls+=" sel";
+    return `<button class="${cls}" data-l="${l}" ${opts.lock?"disabled":""} aria-pressed="${l===chosen}"><span class="bub">${l}</span><span>${o}</span></button>`}).join("");
+  let expl="";
+  if(reveal){const v=!chosen?["sk","Boş bırakıldı"]:chosen===q.a?["ok","Doğru"]:["no","Yanlış · senin cevabın "+chosen];
+    expl=`<div class="expl"><div class="verdict ${v[0]}">${v[1]} · Doğru cevap ${q.a}</div>${q.e}</div>`}
+  return `<div class="qhead"><span class="qnum"><b>Soru ${sec==="T"?i+1:i-39}</b>${opts.sub||""}</span>
+    <span style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="tag sec">${sec==="T"?"Temel":"Klinik"}</span><span class="tag">${DERS[i]}</span>${opts.flagBtn?`<button class="flagbtn" id="flag" aria-pressed="${!!S.flags[i]}">${S.flags[i]?"İşaretli":"Sonra bak"}</button>`:""}</span></div>
+    ${roman}<div class="stem${bold?" allbold":""}">${q.q}</div><div class="choices">${choices}</div>${expl}`;
+}
+function renderQ(){
+  const idx=scopeIdx(),pos=idx.indexOf(S.cur),i=S.cur;
+  const study=S.mode==="calisma",answered=!!S.ans[i],reveal=study&&answered;
+  const blanks=idx.filter(j=>!S.ans[j]).length;
+  $("qcard").innerHTML=qHTML(i,{reveal,lock:reveal,flagBtn:true,sub:` · ${pos+1}/${idx.length}`})+
+   `<div class="qfoot"><div class="grp"><button class="btn" id="prev" ${pos===0?"disabled":""}>Önceki</button><button class="btn primary" id="next" ${pos===idx.length-1?"disabled":""}>Sonraki</button></div>
+    <div class="grp">${!study&&answered?`<button class="btn" id="clear">Cevabı sil</button>`:""}<button class="btn" id="pause">Ara ver</button><button class="btn danger" id="finish">Sınavı bitir</button></div></div>
+    ${confirmOpen?`<div class="confirm" role="alert"><span>${blanks?`<b>${blanks}</b> boş soru var. `:""}Sınavı bitirip sonuçları görmek istiyor musun?</span><span style="display:flex;gap:8px"><button class="btn" id="cancelfin">Vazgeç</button><button class="btn danger" id="dofin">Bitir</button></span></div>`:""}
+    <div class="kbd">Klavye: A–E cevap · ← → gezin · F işaretle</div>`;
+  $("qcard").querySelectorAll(".choice").forEach(b=>b.addEventListener("click",()=>answer(i,b.dataset.l)));
+  $("prev").onclick=()=>go(-1);$("next").onclick=()=>go(1);
+  $("flag").onclick=()=>toggleFlag(i);
+  if($("clear"))$("clear").onclick=()=>{delete S.ans[i];save();renderQ();renderOptik()};
+  $("pause").onclick=()=>{S.paused=true;save();renderDeneme()};
+  $("finish").onclick=()=>{confirmOpen=true;renderQ()};
+  if($("cancelfin"))$("cancelfin").onclick=()=>{confirmOpen=false;renderQ()};
+  if($("dofin"))$("dofin").onclick=()=>finish();
+}
+function answer(i,l){
+  if(S.finished)return;
+  if(S.mode==="calisma"&&S.ans[i])return;
+  if(S.ans[i]===l&&S.mode==="sinav")delete S.ans[i];else S.ans[i]=l;
+  save();if(i===S.cur)renderQ();renderOptik();
+}
+function toggleFlag(i){if(S.flags[i])delete S.flags[i];else S.flags[i]=1;save();renderQ();renderOptik()}
+function go(d){const idx=scopeIdx(),p=idx.indexOf(S.cur)+d;if(p<0||p>=idx.length)return;S.cur=idx[p];confirmOpen=false;save();renderQ();renderOptik(true);window.scrollTo({top:0})}
+function renderOptik(scroll){
+  const idx=scopeIdx(),study=S.mode==="calisma";let html="",last="";
+  idx.forEach(i=>{const sec=SEC(i);
+    if(sec!==last){html+=`<div class="osec">${sec==="T"?"Temel Bilimler Testi":"Klinik Bilimler Testi"}</div>`;last=sec}
+    const a=S.ans[i],n=sec==="T"?i+1:i-39;
+    html+=`<div class="orow${i===S.cur?" cur":""}" id="or-${i}"><button class="n" data-go="${i}" aria-label="Soru ${n}">${n}</button>${L.map(l=>{let c="ob";
+      if(a===l)c+=study?(l===Q[i].a?" ok":" no"):" f";else if(study&&a&&l===Q[i].a)c+=" key";
+      return `<button class="${c}" data-i="${i}" data-l="${l}" aria-label="Soru ${n} şık ${l}">${l}</button>`}).join("")}<span class="fl">${S.flags[i]?"●":""}</span></div>`});
+  $("olist").innerHTML=html;
+  $("ostats").innerHTML=`<span>${idx.filter(i=>S.ans[i]).length}/${idx.length} cevaplandı</span><span>${Object.keys(S.flags).filter(k=>idx.includes(+k)).length} işaretli</span>`;
+  $("olist").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{S.cur=+b.dataset.go;confirmOpen=false;save();renderQ();renderOptik()});
+  $("olist").querySelectorAll(".ob").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;S.cur=i;save();answer(i,b.dataset.l);renderQ()});
+  if(scroll){const r=$("or-"+S.cur),box=$("olist");if(r)box.scrollTop=r.offsetTop-box.offsetTop-box.clientHeight/2}
+}
+function onKey(e){
+  if(S.view!=="deneme"||!S.started||S.finished||S.paused||e.metaKey||e.ctrlKey||e.altKey)return;
+  const t=e.target;if(t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"))return;
+  const k=e.key.toUpperCase();
+  if(L.includes(k)){answer(S.cur,k);e.preventDefault()}
+  else if(e.key==="ArrowRight"){go(1);e.preventDefault()}
+  else if(e.key==="ArrowLeft"){go(-1);e.preventDefault()}
+  else if(k==="F")toggleFlag(S.cur);
+}
+function finish(){const r=score(scopeIdx());S.net=r.n;S.netToplam=r.t;S.finished=true;confirmOpen=false;save();setView("sonuc")}
+
+/* ---------- Sonuç ---------- */
+let filt="yanlis";
+function score(list){let c=0,w=0,b=0;list.forEach(i=>{const a=S.ans[i];if(!a)b++;else if(a===Q[i].a)c++;else w++});return{c,w,b,n:c-w/4,t:list.length}}
+function renderSonuc(){
+  const idx=scopeIdx(),all=score(idx),T=score(idx.filter(i=>i<40)),K=score(idx.filter(i=>i>=40));
+  const n2=x=>x.toFixed(2).replace(".",",");
+  const rows=[];
+  [["Temel Bilimler",TEMEL,0],["Klinik Bilimler",KLINIK,40]].forEach(([gname,list,start])=>{
+    if(S.scope!=="all"&&((S.scope==="T")!==(start===0)))return;
+    const sub=score(idx.filter(i=>start===0?i<40:i>=40));let s=start;
+    rows.push(`<tr class="sub"><td>${gname}</td><td class="num">${sub.t}</td><td class="num">${sub.c}</td><td class="num">${sub.w}</td><td class="num">${sub.b}</td><td class="num">${n2(sub.n)}</td><td></td></tr>`);
+    list.forEach(([d,c])=>{const ids=[];for(let k=0;k<c;k++)ids.push(s+k);s+=c;const r=score(ids),pct=Math.max(0,r.n/r.t*100);
+      rows.push(`<tr><td>${d}</td><td class="num">${r.t}</td><td class="num">${r.c}</td><td class="num">${r.w}</td><td class="num">${r.b}</td><td class="num">${n2(r.n)}</td><td><div class="minibar"><div style="width:${pct}%"></div></div></td></tr>`)});
+  });
+  const weak=[...TEMEL,...KLINIK].map(([d])=>{const ids=idx.filter(i=>DERS[i]===d);return ids.length?{d,r:score(ids)}:null}).filter(Boolean).sort((a,b)=>a.r.n/a.r.t-b.r.n/b.r.t).slice(0,3);
+  $("v-sonuc").innerHTML=`<div class="eyebrow">${S.mode==="sinav"?"Sınav modu":"Çalışma modu"} · süre ${fmt(S.elapsed)}</div>
+    <h2>Sonuç: ${n2(all.n)} net / ${all.t} soru</h2>
+    <p class="lede" style="font-size:16px">${S.scope==="all"?`Temel ${n2(T.n)} net, Klinik ${n2(K.n)} net. `:""}Net = doğru − yanlış ÷ 4. En çok çalışılması gereken dersler: ${weak.map(w=>`<b>${w.d}</b>`).join(", ")}.</p>
+    <div class="rtiles"><div class="rt ok"><b>${all.c}</b><span>doğru</span></div><div class="rt no"><b>${all.w}</b><span>yanlış</span></div><div class="rt sk"><b>${all.b}</b><span>boş</span></div><div class="rt"><b>${n2(all.n)}</b><span>net</span></div></div>
+    <section class="block"><h2>Ders bazında</h2>
+    <div class="tablewrap"><table><thead><tr><th>Ders</th><th class="num">Soru</th><th class="num">D</th><th class="num">Y</th><th class="num">B</th><th class="num">Net</th><th>Başarı</th></tr></thead><tbody>${rows.join("")}</tbody></table></div></section>
+    <section class="block"><h2>Soru soru inceleme</h2>
+    <div class="filters" id="filters">${[["yanlis","Yanlışlar"],["bos","Boşlar"],["isaret","İşaretlediklerim"],["tum","Tümü"]].map(([k,t])=>`<button data-f="${k}" aria-pressed="${filt===k}">${t}</button>`).join("")}</div>
+    <div class="review" id="review"></div></section>
+    <div class="cta"><button class="btn" id="again">Bu denemeyi yeniden çöz</button><a class="btn" href="index.html" style="text-decoration:none">Tüm denemeler</a></div>`;
+  $("filters").querySelectorAll("button").forEach(b=>b.onclick=()=>{filt=b.dataset.f;renderSonuc()});
+  const list=idx.filter(i=>filt==="tum"||(filt==="yanlis"&&S.ans[i]&&S.ans[i]!==Q[i].a)||(filt==="bos"&&!S.ans[i])||(filt==="isaret"&&S.flags[i]));
+  $("review").innerHTML=list.length?list.map(i=>`<div class="qcard">${qHTML(i,{reveal:true,lock:true})}</div>`).join(""):`<div class="empty">Bu filtrede soru yok.</div>`;
+  $("again").onclick=()=>{S=fresh();save();setView("deneme")};
+}
+</script>
+</body>
+</html>

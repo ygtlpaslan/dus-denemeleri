@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DUS Denemeleri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="ortak.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><h1>DUS <span>Denemeleri</span></h1><small>Ücretsiz, açıklamalı, gerçek dağılımda</small></div>
+    <a class="navlink" href="#analiz">2026 sınav analizi</a>
+  </div>
+</header>
+<main class="wrap">
+  <div class="eyebrow">Denemeler</div>
+  <h2>Çöz, netini gör, eksiğini kapat</h2>
+  <p class="lede">Her deneme 120 soru, 150 dakika; dağılım ve net hesabı (4 yanlış 1 doğruyu götürür) gerçek DUS ile aynı. Cevapların yalnızca senin tarayıcında saklanır.</p>
+  <div class="dlist" id="dlist"></div>
+  <section id="analiz" class="block">
+  <div class="eyebrow">Sınav analizi</div>
+  <h2>26 Nisan 2026 DUS'u ne sordu, sırada ne var?</h2>
+  <p class="lede">Klasördeki iki kitapçığın (Temel Bilimler 40 soru, Klinik Bilimler 80 soru) tüm soruları ve cevap anahtarları tek tek incelendi. Aşağıda format, ders dağılımı, soru tipleri ve konu haritası var. Yukarıdaki denemelerin hepsi aynı ders dağılımıyla ve benzer soru tipi oranlarıyla yazılıyor.</p>
+
+  <div class="facts">
+    <div class="fact"><b>120</b><span>soru (40 Temel + 80 Klinik)</span></div>
+    <div class="fact"><b>150 dk</b><span>soru başına ≈ 75 saniye</span></div>
+    <div class="fact"><b>5 şık</b><span>tek doğru cevap (A–E)</span></div>
+    <div class="fact"><b>4Y = 1D</b><span>4 yanlış 1 doğruyu götürür</span></div>
+  </div>
+
+  <section class="block">
+    <h2>Ders bazında soru sayısı</h2>
+    <p class="note">2026 kitapçığındaki soru sırası ve konu blokları ÖSYM'nin sabit dağılımıyla birebir örtüşüyor. Klinik testte her dal tam 10 soru.</p>
+    <div class="two">
+      <div class="panel"><h3>Temel Bilimler Testi · 40</h3><div class="bars" id="bars-t"></div></div>
+      <div class="panel"><h3>Klinik Bilimler Testi · 80</h3><div class="bars" id="bars-k"></div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Soru tipleri</h2>
+    <p class="note">Her soru tek bir baskın tipe göre sayıldı. Olumsuz kök: <i>değildir, yanlıştır, en az olası, kullanılmaz, etkilemez, uygulanmaz</i> gibi altı çizili ifadeler. 2026'da toplam <b>29/120</b> soru olumsuz kökle soruldu (Temel 6, Klinik 23).</p>
+    <div class="panel" id="types-2026" style="margin-top:14px;max-width:640px"></div>
+    <div class="legend" id="types-legend"></div>
+  </section>
+
+  <section class="block">
+    <h2>Cevap anahtarı dağılımı</h2>
+    <p class="note">Doğru şıklar beşe yakın eşit dağılmış; "çok C çıktı, bu da C olabilir" türü tahminin bir dayanağı yok.</p>
+    <div class="two">
+      <div class="panel"><h3>Temel (2026)</h3><div class="keyd" id="key-t"></div></div>
+      <div class="panel"><h3>Klinik (2026)</h3><div class="keyd" id="key-k"></div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Ders ders konu haritası</h2>
+    <p class="note">Sol: 2026'da sorulan konular. Sağ: 2026'da sorulmayan ama yüksek getirili, sıradaki sınavlarda gelmesi olası konular. Yeni denemeler önce sağ sütundaki konulardan beslenir.</p>
+    <div class="topics" id="topics"></div>
+  </section>
+
+  <section class="block">
+    <h2>2026 kitapçığından çıkan dersler</h2>
+    <div class="tips">
+      <div class="tip"><b>Altı çizili kelimeyi işaretle</b><p>Her dört sorudan biri olumsuz kökle geldi. Klinik testte bu oran %29. Soruyu okurken "en az olası / değildir" ifadesini kitapçıkta yuvarlak içine al.</p></div>
+      <div class="tip"><b>Öncüllü sorularda ele</b><p>12 klinik soru I-II-III(-IV) formatındaydı. Kesin yanlış bir öncülü bulunca o öncülü içeren tüm şıkları sil; çoğu zaman tek şık kalır.</p></div>
+      <div class="tip"><b>Kılavuz soruları arttı</b><p>ESC 2023 endokardit profilaksisi, IADT 2020 travma rehberi, 2017 periodontal sınıflama ve TNM evrelemesi doğrudan soruldu. AAOMS 2022 (MRONJ), AAE tanı terimleri ve AAPD önerileri de sırada.</p></div>
+      <div class="tip"><b>Hesaplama soruları puandır</b><p>DMFT/DMFS hesabı, ters kare kanunu ve TNM evresi soruldu. Lokal anestezik kartuş sayısı, florür toksik dozu, ANB ve evre/derece hesabını denemede çalış.</p></div>
+      <div class="tip"><b>Vakalar temel bilgiyi sorar</b><p>Klinik testin 22 sorusu vaka formatındaydı, ancak çoğu tek bir anahtar bulguyla çözülüyor (ör. "kar tanesi" → AOT, katepsin C → Haim-Munk). Vaka metninde o bulguyu ara.</p></div>
+      <div class="tip"><b>Ne zaman tahmin etmeli?</b><p>Netin beklenen değeri: iki şıkka indirdiysen +0,375, üç şıkka indirdiysen +0,17. Rastgele beş şık beklenen değeri 0'dır. İki ya da üç şıkka indirebildiğin her soruyu işaretle.</p></div>
+    </div>
+  </section>
+
+  </section>
+</main>
+<script src="denemeler/liste.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const TEMEL=[["Anatomi",6],["Histoloji ve Embriyoloji",4],["Fizyoloji",6],["Biyokimya",6],["Mikrobiyoloji",6],["Patoloji",4],["Farmakoloji",4],["Tıbbi Biyoloji ve Genetik",4]];
+const KLINIK=[["Restoratif Diş Tedavisi",10],["Protetik Diş Tedavisi",10],["Ağız, Diş ve Çene Cerrahisi",10],["Ağız, Diş ve Çene Radyolojisi",10],["Periodontoloji",10],["Ortodonti",10],["Endodonti",10],["Çocuk Diş Hekimliği",10]];
+const L=["A","B","C","D","E"];
+const TYPES={bilgi:["Doğrudan bilgi","var(--chart1)"],olumsuz:["Olumsuz kök","var(--chart2)"],vaka:["Vaka / senaryo","var(--chart3)"],oncullu:["Öncüllü (I-II-III)","var(--chart4)"],eslestirme:["Eşleştirme","var(--chart5)"],hesap:["Hesaplama","var(--muted)"]};
+const T2026={T:{bilgi:26,olumsuz:5,oncullu:4,vaka:4,eslestirme:1},K:{bilgi:24,olumsuz:21,vaka:22,oncullu:12,eslestirme:1}};
+const KEY2026={T:{A:8,B:8,C:7,D:8,E:9},K:{A:15,B:17,C:17,D:15,E:16}};
+const TOPICS=[
+["Anatomi","n. buccalis blokajı (fossa retromolaris)|Retraksiyon: m. temporalis|Fissura orbitalis superior, Zinn halkası dışı (n. lacrimalis)|Conus elasticus → lig. vocale|Sinus cavernosus trombozu|Kafa tabanı delikleri (porus acusticus internus)","N. lingualis, chorda tympani ve tat yolları|Fossa pterygopalatina bağlantıları|Kas–sinir eşleştirmeleri (V3, VII, XII)|Larinks iç kasları ve n. laryngeus recurrens|Tükürük bezlerinin parasempatik yolları|N. alveolaris inferior blokajı anatomisi"],
+["Histoloji ve Embriyoloji","Miyeloperoksidaz → nötrofil|Meckel kıkırdağı → mandibula|Yanak mukozası epitel tabakaları|Mide epiteli (Paneth hücresi yok)","Hertwig kök kını, Malassez artıkları|Faringeal ark ve kese türevleri|Tomes lifi / Tomes çıkıntısı ayrımı|Ağız mukozası tipleri|Damak ve dil gelişimi"],
+["Fizyoloji","Parasempatik uyarı ve tükürük|Monosit → makrofaj|Sürfaktan eksikliği|Kalsiyum homeostazı (PTH, D vit., kalsitonin)|VIP ve alt özofagus sfinkteri|Repolarizasyon: voltaj kapılı K⁺","Kalp aksiyon potansiyeli fazları|O₂–Hb eğrisi ve Bohr etkisi|Aldosteron ve ADH ayrımı|Mide asit salgısı düzenlenmesi|Saltatorik iletim|Kas kasılması (troponin, kalmodulin)"],
+["Biyokimya","De novo pirimidin: OMP|Kovalent modifikasyon: fosforilasyon|Lipoprotein lipaz|NAD/NADP öncülü: niasin|GLUT2 (yüksek Km)|Peptid olmayan hormon: kortizol","Kollajen sentezi ve C vitamini|Hız kısıtlayıcı enzimler|Hem sentezi (ALA sentaz)|Aminoasit metabolizma bozuklukları|Pentoz fosfat yolu|Glikolizde substrat düzeyinde fosforilasyon"],
+["Mikrobiyoloji","Cryptococcus neoformans|M. tuberculosis özellikleri|Hayvan rezervuarı olmayan virus (polio)|C. albicans, germ tüp testi|IgM özellikleri|P. falciparum gametositleri","S. mutans virülans faktörleri|Hepatit B serolojisi|Sterilizasyon biyolojik indikatörleri|Aşırı duyarlılık tipleri|El-ayak-ağız hastalığı / herpanjina|Socransky kompleksleri"],
+["Patoloji","p53 (genom gardiyanı)|Kazeöz nekroz → tüberküloz|Kaposi sarkomu (HHV-8)|Çenede kondroblastik osteosarkom","Geri dönüşümsüz hücre hasarı bulguları|Apoptoz ve nekroz ayrımı|Malignite ölçütleri|Odontojenik keratokist histolojisi|Tükürük bezi tümörleri"],
+["Farmakoloji","Metirozin (NA salınımı/geri alımı)|Gebelik kategorisi X|Seftarolin (MRSA)|Ondansetron (5-HT₃)","Lokal anestezikler (artikain, prilokain)|Varfarin etkileşimleri|Aspirin mekanizması|Opioid etkileri ve tolerans|Gebelikte güvenli/riskli ilaçlar"],
+["Tıbbi Biyoloji ve Genetik","Zardan serbest geçiş: kortizol|Mannoz-6-fosfat → Golgi|Yanlış eşleşme düzeltme: DNA pol δ|mRNA işlenmesi (5′ cap)","Başlangıç kodonu ve genetik kod|Diş anomalisi genleri (DSPP, AMELX, MSX1, PAX9)|Hücre döngüsü (siklin D–CDK4/6, Rb)|Mitokondri ve peroksizom"],
+["Restoratif Diş Tedavisi","Rezin infiltrant|DMFT / DMFS hesabı|Tükürük özellikleri|Cam iyonomer simanlar|MTA ve Ca(OH)₂|Renk seçimi|Başlangıç çürük|İntrinsik renklenmeler|LED ışık cihazı nesilleri|1. molar kalsifikasyonu","Black sınıflaması|ICDAS kodları|Etch-and-rinse / self-etch adezivler|Polimerizasyon büzülmesi, C-faktörü|Amalgam fazları (γ₂)|Abfraksiyon / abrazyon / erozyon|Dentin hassasiyeti ajanları|Devital beyazlatma"],
+["Protetik Diş Tedavisi","Embraşürler|Aljinat|TME tanısı|Hue / kroma / value|Embraşür kroşe|Kombinasyon sendromu|Rehber düzlemler|Erken yükleme|Miyofasiyal ağrı|Grup fonksiyonu oklüzyon","Dikey boyut ve serbest aralık|Kennedy–Applegate|RPI kroşe sistemi|Ölçü maddeleri ve yan ürünleri|Zirkonya / cam seramik yüzey işlemi|Fonetik testler|Redüksiyonsuz disk deplasmanı|Ante kanunu, kuron-kök oranı"],
+["Ağız, Diş ve Çene Cerrahisi","Benzodiazepin ve yarık damak|Distraksiyon: konsolidasyon fazı|Mandibula kırığında kas çekişi|Kondil kırığı komplikasyonları|Gebelikte tetrasiklin|Noma|TNM evrelemesi|Aft ve sekonder herpes|Adenoid kistik karsinom|ESC 2023: klindamisin","Lokal anestezik maksimum doz|Le Fort kırıkları|Pell-Gregory sınıflaması|Varfarin kullanan hasta|Anafilaksi yönetimi|Alveolar osteit|Oroantral fistül|Biyopsi ilkeleri|AAOMS 2022 MRONJ evrelemesi"],
+["Ağız, Diş ve Çene Radyolojisi","Turner hipoplazisi|Papillon-Lefèvre|Sementoblastoma|Peutz-Jeghers|Gardner sendromu|AOT (kar tanesi)|Mach band etkisi|Nazopalatin kanal|Gy–Sv birimleri|Ters kare kanunu","kVp / mA etkileri|Stokastik ve deterministik etkiler|Bukkal obje kuralı (SLOB)|Panoramik konumlandırma hataları|Stafne kemik kavitesi|Periapikal sementoosseöz displazi|Fibröz displazi|Multiloküler lezyonlar|Radyasyondan korunma"],
+["Periodontoloji","Birleşim epiteli|Antimikrobiyal peptidler|Haim-Munk (katepsin C)|Evre kriterleri|GWAS|Ağız solunumu gingiviti|Peri-implantitis dekontaminasyonu|Flepsiz implant cerrahisi|Rotasyonel flepler|Gracey 13-14","Evre + derece hesabı (sigara, HbA1c)|RANKL / OPG|İlaca bağlı dişeti büyümesi|Gracey ve universal küret|Nekrotizan periodontal hastalık|Cairo resesyon sınıflaması|Glickman furkasyon|Peri-implantitis tanı kriterleri|GTR ilkesi|Molar/kesici paterni ve A.a."],
+["Ortodonti","Treacher Collins|Twin-block|Sınıf III elastik|Mini vida ile intrüzyon|Ortognatik stabilite sıralaması|Bimaksiller cerrahi planı|Yüz maskesi kuvvet yönü|Hızlı maksiller genişletme|Fonksiyonel apareyler","ANB yorumu|El-bilek ve CVM|Moment/kuvvet oranı|Ankraj apareyleri|Moyers / Tanaka-Johnston|Dişsel anterior çapraz kapanış|HMG etkileri|Parmak emme bulguları|Retansiyon ve supraalveoler lifler"],
+["Endodonti","Pulpal kan akımı|Ultrasonik kullanım sınırları|Apikal skar|Vertikal kök kırığı|Mandibular anestezi teknikleri|Pulpa odası anatomik belirteci|Alt premolar kanal anatomisi|Bifosfonat ve çekim|EPT yanlış pozitif|IADT 2020 intrüzyon","AAE tanı terminolojisi|NaOCl–CHX çökeltisi|EDTA|MB2 kanalı|Vertucci sınıflaması|Avülsiyonda splint süresi|NiTi siklik yorgunluk|Ca(OH)₂ ve E. faecalis|Kök ucu rezeksiyonu|İnternal / eksternal rezorpsiyon"],
+["Çocuk Diş Hekimliği","Yer tutucu planlaması|Diş gelişim evreleri|Ankiloze süt dişleri|Servikal pulpotomi|Fasiyal selülit|Fissür örtücüler|Süt dişi intrüzyonu|Süt kanine bukkal infiltrasyon|Nötrofil bozuklukları|Lösemili çocukta çekim","Florür toksik doz hesabı|Primat aralıkları|Süt dişi pulpotomi materyalleri|Frankl ölçeği|Erken çocukluk çağı çürüğü|Distal shoe|Süt dişi avülsiyonu|Ektodermal displazi|Hipofosfatazya|Paslanmaz çelik kuron"]
+];
+
+
+/* ---------- Deneme listesi ---------- */
+function drawList(){
+  const list=(window.DENEMELER||[]).slice().sort((a,b)=>b.no-a.no);
+  if(!list.length){$("dlist").innerHTML="<div class=\"empty\">Henüz yayınlanmış deneme yok.</div>";return}
+  $("dlist").innerHTML=list.map((d,k)=>{
+    let st=null;try{st=JSON.parse(localStorage.getItem("dus-deneme-"+d.no+"-v1")||"null")}catch(e){}
+    let status="<span class=\"status none\">Başlanmadı</span>",btn="Başla";
+    if(st&&st.finished){status="<span class=\"status done\">Tamamlandı"+(typeof st.net==="number"?" · "+st.net.toFixed(2).replace(".",",")+" net / "+st.netToplam:"")+"</span>";btn="Sonucu gör"}
+    else if(st&&st.started){status="<span class=\"status prog\">Devam ediyor · "+Object.keys(st.ans||{}).length+" cevap</span>";btn="Devam et"}
+    const tarih=d.tarih?new Date(d.tarih+"T12:00:00").toLocaleDateString("tr-TR",{day:"numeric",month:"long",year:"numeric"}):"";
+    return `<article class="dcard${k===0?" new":""}"><div class="top"><h3>${d.baslik}</h3>${k===0?"<span class=\"badge\">En yeni</span>":""}</div><time datetime="${d.tarih}">${tarih}</time><p>${d.aciklama||""}</p>${status}<a class="btn${k===0?" primary":""}" href="deneme.html?no=${d.no}">${btn}</a></article>`}).join("");
+}
+function drawAnaliz(){
+  const bars=(list,max,el,color)=>{$(el).innerHTML=list.map(([n,c])=>`<div class="bar"><span class="lab" title="${n}">${n}</span><span class="track"><span class="fill" style="display:block;width:${c/max*100}%;background:${color}"></span></span><span class="val">${c}</span></div>`).join("")};
+  bars(TEMEL,10,"bars-t","var(--chart1)");bars(KLINIK,10,"bars-k","var(--chart2)");
+  const order=["bilgi","olumsuz","vaka","oncullu","eslestirme","hesap"];
+  const stack=(title,data,total)=>`<div class="stack-row"><div class="hd"><span>${title}</span><span class="muted" style="font-weight:400">${total} soru</span></div><div class="stack">${order.filter(k=>data[k]).map(k=>`<div style="flex:${data[k]};background:${TYPES[k][1]}" title="${TYPES[k][0]}: ${data[k]}">${data[k]}</div>`).join("")}</div></div>`;
+  $("types-2026").innerHTML="<h3>26 Nisan 2026</h3>"+stack("Temel",T2026.T,40)+stack("Klinik",T2026.K,80);
+  $("types-legend").innerHTML=order.map(k=>`<span><i style="background:${TYPES[k][1]}"></i>${TYPES[k][0]}</span>`).join("");
+  const keyd=(d,el,color)=>{const mx=Math.max(...Object.values(d));$(el).innerHTML=L.map(l=>`<div><span>${d[l]}</span><span class="col" style="height:${d[l]/mx*80}%;background:${color}"></span><b>${l}</b></div>`).join("")};
+  keyd(KEY2026.T,"key-t","var(--chart1)");keyd(KEY2026.K,"key-k","var(--chart2)");
+  $("topics").innerHTML=TOPICS.map(([n,a,b],i)=>{const cnt=[...TEMEL,...KLINIK].find(x=>x[0]===n)[1];return `<details class="topic"${i===0?" open":""}><summary><span>${n}</span><span class="cnt">${cnt} soru · ${i<8?"Temel":"Klinik"}</span></summary><div class="tbody"><div><h4>2026'da sorulan</h4><div class="chips">${a.split("|").map(x=>`<span class="chip">${x}</span>`).join("")}</div></div><div><h4>Çıkabilecek</h4><ul>${b.split("|").map(x=>`<li>${x}</li>`).join("")}</ul></div></div></details>`}).join("");
+}
+
+
+drawList();drawAnaliz();
+</script>
+</body>
+</html>
